@@ -15,61 +15,67 @@
 #ifndef PNNX_STOREZIP_H
 #define PNNX_STOREZIP_H
 
-#include <cstdint>
+#include <stdint.h>
 #include <map>
 #include <string>
 #include <vector>
 
 namespace pnnx {
 
-class StoreZipReader {
- public:
-  StoreZipReader();
-  ~StoreZipReader();
+class StoreZipReader
+{
+public:
+    StoreZipReader();
+    ~StoreZipReader();
 
-  int open(const std::string& path);
+    int open(const std::string& path);
 
-  size_t get_file_size(const std::string& name);
+    std::vector<std::string> get_names() const;
 
-  int read_file(const std::string& name, char* data);
+    uint64_t get_file_size(const std::string& name) const;
 
-  int close();
+    int read_file(const std::string& name, char* data);
 
- private:
-  FILE* fp;
+    int close();
 
-  struct StoreZipMeta {
-    size_t offset;
-    size_t size;
-  };
+private:
+    FILE* fp;
 
-  std::map<std::string, StoreZipMeta> filemetas;
+    struct StoreZipMeta
+    {
+        uint64_t offset;
+        uint64_t size;
+    };
+
+    std::map<std::string, StoreZipMeta> filemetas;
 };
 
-class StoreZipWriter {
- public:
-  StoreZipWriter();
-  ~StoreZipWriter();
+class StoreZipWriter
+{
+public:
+    StoreZipWriter();
+    ~StoreZipWriter();
 
-  int open(const std::string& path);
+    int open(const std::string& path);
 
-  int write_file(const std::string& name, const char* data, size_t size);
+    int write_file(const std::string& name, const char* data, uint64_t size);
 
-  int close();
+    int close();
 
- private:
-  FILE* fp;
+private:
+    FILE* fp;
 
-  struct StoreZipMeta {
-    std::string name;
-    size_t lfh_offset;
-    uint32_t crc32;
-    uint32_t size;
-  };
+    struct StoreZipMeta
+    {
+        std::string name;
+        uint64_t lfh_offset;
+        uint32_t crc32;
+        uint64_t size;
+    };
 
-  std::vector<StoreZipMeta> filemetas;
+    std::vector<StoreZipMeta> filemetas;
 };
 
-}  // namespace pnnx
+} // namespace pnnx
 
-#endif  // PNNX_STOREZIP_H
+#endif // PNNX_STOREZIP_H
